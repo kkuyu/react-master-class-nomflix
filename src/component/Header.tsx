@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
-import { motion } from "framer-motion";
+import { motion, useAnimation, useViewportScroll } from "framer-motion";
 
-const Nav = styled.nav`
+const Nav = styled(motion.nav)`
   position: fixed;
   top: 0;
   left: 0;
@@ -11,11 +11,10 @@ const Nav = styled.nav`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 80px;
+  height: 60px;
   padding: 20px 60px;
-  font-size: 14px;
+  font-size: 16px;
   color: #fff;
-  background-color: #000;
 `;
 
 const Column = styled.div`
@@ -78,6 +77,8 @@ const Search = styled.div`
 `;
 
 const Input = styled(motion.input)`
+  margin-left: 0;
+  width: 0;
   height: 25px;
   padding: 0;
   color: white;
@@ -101,16 +102,52 @@ const logoVariants = {
   },
 };
 
+const navVariants = {
+  top: {
+    backgroundColor: "rgba(0, 0, 0, 0)",
+  },
+  scroll: {
+    backgroundColor: "rgba(0, 0, 0, 1)",
+  },
+};
+
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   const homeMatch = useMatch("/");
   const tvMatch = useMatch("/tv");
 
-  const toggleSearch = () => setSearchOpen((prev) => !prev);
+  const { scrollY } = useViewportScroll();
+  const inputAnimation = useAnimation();
+  const navAnimation = useAnimation();
+
+  const toggleSearch = () => {
+    if (searchOpen) {
+      inputAnimation.start({
+        width: "0px",
+        marginLeft: "0px",
+      });
+    } else {
+      inputAnimation.start({
+        width: "190px",
+        marginLeft: "10px",
+      });
+    }
+    setSearchOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    scrollY.onChange(() => {
+      if (scrollY.get() > 60) {
+        navAnimation.start("scroll");
+      } else {
+        navAnimation.start("top");
+      }
+    });
+  }, [scrollY]);
 
   return (
-    <Nav>
+    <Nav variants={navVariants} animate={navAnimation} initial="top">
       <Column>
         <Logo
           role="img"
@@ -146,7 +183,7 @@ function Header() {
             <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd"></path>
           </svg>
         </button>
-        <Input transition={{ type: "linear" }} animate={{ width: searchOpen ? "190px" : "0px", marginLeft: searchOpen ? "10px" : "0px" }} placeholder="Search for movie or tv show..." />
+        <Input animate={inputAnimation} transition={{ type: "linear" }} placeholder="Search for movie or tv show..." />
       </Search>
     </Nav>
   );
