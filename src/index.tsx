@@ -70,6 +70,9 @@ a {
   text-decoration:none;
   color:inherit;
 }
+button {
+  cursor: pointer;
+}
 `;
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLDivElement);
