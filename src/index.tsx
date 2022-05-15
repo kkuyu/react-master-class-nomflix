@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { RecoilRoot } from "recoil";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 import { theme } from "./theme";
@@ -75,14 +76,18 @@ button {
 }
 `;
 
+const client = new QueryClient();
+
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLDivElement);
 root.render(
   <React.StrictMode>
     <RecoilRoot>
-      <ThemeProvider theme={theme}>
-        <GlobalStyle />
-        <App />
-      </ThemeProvider>
+      <QueryClientProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <App />
+        </ThemeProvider>
+      </QueryClientProvider>
     </RecoilRoot>
   </React.StrictMode>
 );

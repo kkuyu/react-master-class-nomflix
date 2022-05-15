@@ -1,5 +1,10 @@
+import { useQuery } from "react-query";
+import { getMovies } from "../api";
+
 function Home() {
-  return <div style={{ background: "gray", height: "200vh" }}>Home</div>;
+  const { data, isLoading } = useQuery(["movies", "nowPlaying"], getMovies);
+  console.log(data, isLoading);
+  return <div style={{ backgroundColor: "whitesmoke", height: "200vh" }}>home</div>;
 }
 
 export default Home;
