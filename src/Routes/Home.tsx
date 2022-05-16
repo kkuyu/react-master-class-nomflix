@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Outlet, useMatch } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useQuery } from "react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
@@ -203,4 +203,5 @@ function Home() {
     </Wrapper>
   );
 }
+
 export default Home;
