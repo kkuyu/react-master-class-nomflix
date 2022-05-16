@@ -41,8 +41,16 @@ const Overview = styled.p`
 
 const Slider = styled.div`
   position: relative;
-  margin-top: -100px;
   width: 100%;
+  &:before {
+    content: "";
+    display: block;
+    width: 100%;
+    padding-bottom: 10%;
+  }
+  &:first-child {
+    margin-top: -100px;
+  }
 `;
 
 const Row = styled(motion.div)`
@@ -53,23 +61,33 @@ const Row = styled(motion.div)`
   gap: 10px;
   grid-template-columns: repeat(6, 1fr);
   width: 100%;
+  height: 100%;
 `;
 
 const Box = styled(motion.div)<{ $bgPhoto: string }>`
   font-size: 20px;
   background-image: url(${(props) => props.$bgPhoto});
   background-size: cover;
-  &:before {
-    content: "";
-    display: block;
-    width: 100%;
-    padding-bottom: 56%;
-  }
   &:first-child {
     transform-origin: center left;
   }
   &:last-child {
     transform-origin: center right;
+  }
+`;
+
+const Info = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  h4 {
+    display: block;
+    padding: 10px;
+    background-color: black;
+    text-align: center;
+    font-size: 14px;
   }
 `;
 
@@ -91,7 +109,19 @@ const boxVariants = {
   },
   hover: {
     scale: 1.3,
-    y: -20,
+    y: -40,
+    zIndex: 1,
+    transition: {
+      delay: 0.3,
+      duration: 0.2,
+      type: "tween",
+    },
+  },
+};
+
+const infoVariants = {
+  hover: {
+    opacity: 1,
     transition: {
       delay: 0.3,
       duration: 0.2,
@@ -133,25 +163,31 @@ function Home() {
             <Title>{data?.results[0].title}</Title>
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
-          <Slider>
-            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-              <Row variants={rowVariants} initial="hidden" animate="visible" exit="exit" transition={{ type: "tween", duration: 1 }} key={index}>
-                {data?.results
-                  .slice(1)
-                  .slice(offset * index, offset * (index + 1))
-                  .map((movie) => (
-                    <Box
-                      variants={boxVariants}
-                      whileHover="hover"
-                      initial="normal"
-                      transition={{ type: "tween" }}
-                      key={movie.id}
-                      $bgPhoto={makeImagePath(movie.backdrop_path || movie.poster_path, "w500")}
-                    />
-                  ))}
-              </Row>
-            </AnimatePresence>
-          </Slider>
+          <div>
+            <Slider>
+              <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+                <Row variants={rowVariants} initial="hidden" animate="visible" exit="exit" transition={{ type: "tween", duration: 1 }} key={index}>
+                  {data?.results
+                    .slice(1)
+                    .slice(offset * index, offset * (index + 1))
+                    .map((movie) => (
+                      <Box
+                        variants={boxVariants}
+                        whileHover="hover"
+                        initial="normal"
+                        transition={{ type: "tween" }}
+                        key={movie.id}
+                        $bgPhoto={makeImagePath(movie.backdrop_path || movie.poster_path, "w500")}
+                      >
+                        <Info variants={infoVariants}>
+                          <h4>{movie.title}</h4>
+                        </Info>
+                      </Box>
+                    ))}
+                </Row>
+              </AnimatePresence>
+            </Slider>
+          </div>
         </>
       )}
     </Wrapper>

@@ -1,4 +1,14 @@
 export function makeLineClampStyle(lineHeight: number, clamp: number) {
+  if (clamp === 1) {
+    return `
+      & {
+        display: block;
+        line-height: ${lineHeight};
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }`;
+  }
   return `& {
     display: block;
     display: -webkit-box;
