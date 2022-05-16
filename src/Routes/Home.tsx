@@ -43,8 +43,6 @@ const Slider = styled.div`
   position: relative;
   margin-top: -100px;
   width: 100%;
-  height: 200px;
-  overflow: hidden;
 `;
 
 const Row = styled(motion.div)`
@@ -55,25 +53,50 @@ const Row = styled(motion.div)`
   gap: 10px;
   grid-template-columns: repeat(6, 1fr);
   width: 100%;
-  height: 100%;
 `;
 
 const Box = styled(motion.div)<{ $bgPhoto: string }>`
   font-size: 20px;
   background-image: url(${(props) => props.$bgPhoto});
   background-size: cover;
-  background-position: center center;
+  &:before {
+    content: "";
+    display: block;
+    width: 100%;
+    padding-bottom: 56%;
+  }
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
 `;
 
 const rowVariants = {
   hidden: {
-    x: "100vw",
+    x: "calc(100vw + 10px)",
   },
   visible: {
     x: 0,
   },
   exit: {
-    x: "-100vw",
+    x: "calc(-100vw - 10px)",
+  },
+};
+
+const boxVariants = {
+  normal: {
+    scale: 1,
+  },
+  hover: {
+    scale: 1.3,
+    y: -20,
+    transition: {
+      delay: 0.3,
+      duration: 0.2,
+      type: "tween",
+    },
   },
 };
 
@@ -92,7 +115,7 @@ function Home() {
       if (leaving) return;
       toggleLeaving();
       const totalMovies = data.results.length - 1;
-      const maxIndex = Math.ceil(totalMovies / offset) - 1;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
   };
@@ -106,7 +129,7 @@ function Home() {
       )}
       {!isLoading && (
         <>
-          <Banner onClick={increaseIndex} $bgPhoto={makeImagePath(data?.results[0].backdrop_path || "")}>
+          <Banner onClick={increaseIndex} $bgPhoto={makeImagePath(data?.results[0].backdrop_path || data?.results[0].poster_path || "")}>
             <Title>{data?.results[0].title}</Title>
             <Overview>{data?.results[0].overview}</Overview>
           </Banner>
@@ -117,7 +140,14 @@ function Home() {
                   .slice(1)
                   .slice(offset * index, offset * (index + 1))
                   .map((movie) => (
-                    <Box key={movie.id} $bgPhoto={makeImagePath(movie.backdrop_path, "w500")} />
+                    <Box
+                      variants={boxVariants}
+                      whileHover="hover"
+                      initial="normal"
+                      transition={{ type: "tween" }}
+                      key={movie.id}
+                      $bgPhoto={makeImagePath(movie.backdrop_path || movie.poster_path, "w500")}
+                    />
                   ))}
               </Row>
             </AnimatePresence>
