@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, Outlet, useMatch } from "react-router-dom";
 import { useQuery } from "react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
@@ -71,12 +71,6 @@ const Box = styled(motion.button)<{ $bgPhoto: string }>`
   font-size: 20px;
   background-image: url(${(props) => props.$bgPhoto});
   background-size: cover;
-  &:first-child {
-    transform-origin: center left;
-  }
-  &:last-child {
-    transform-origin: center right;
-  }
 `;
 
 const Info = styled(motion.div)`
@@ -135,6 +129,7 @@ const offset = 6;
 
 function Home() {
   const navigate = useNavigate();
+  const moviesMatch = useMatch("/movies/:movieId");
 
   const { data, isLoading } = useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getMovies);
 
@@ -153,6 +148,7 @@ function Home() {
     }
   };
 
+  const activeMovie = moviesMatch?.params.movieId && data?.results.find((movie) => `${movie.id}` === moviesMatch.params.movieId);
   const onBoxClicked = (movieId: number) => {
     navigate(`/movies/${movieId}`);
   };
@@ -177,7 +173,7 @@ function Home() {
                   {data?.results
                     .slice(1)
                     .slice(offset * index, offset * (index + 1))
-                    .map((movie) => (
+                    .map((movie, index) => (
                       <Box
                         key={movie.id}
                         layoutId={`movieBox${movie.id}`}
@@ -185,6 +181,7 @@ function Home() {
                         whileHover="hover"
                         initial="normal"
                         transition={{ type: "tween" }}
+                        style={{ originX: index === 0 ? 0 : index === offset - 1 ? 1 : 0.5 }}
                         onClick={() => onBoxClicked(movie.id)}
                         $bgPhoto={makeImagePath(movie.backdrop_path || movie.poster_path, "w500")}
                       >
@@ -197,7 +194,7 @@ function Home() {
               </AnimatePresence>
             </Slider>
           </div>
-          <Outlet />
+          <Outlet context={{ activeMovie }} />
         </>
       )}
     </Wrapper>
