@@ -1,9 +1,10 @@
+import { useState } from "react";
+import { useNavigate, Outlet, useMatch } from "react-router-dom";
 import { useQuery } from "react-query";
-import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
+import styled from "styled-components";
 import { getMovies, IGetMoviesResult } from "../api";
 import { makeImagePath, makeLineClampStyle } from "../utils";
-import { useState } from "react";
 
 const Wrapper = styled.div`
   background: black;
@@ -64,7 +65,9 @@ const Row = styled(motion.div)`
   height: 100%;
 `;
 
-const Box = styled(motion.div)<{ $bgPhoto: string }>`
+const Box = styled(motion.button)<{ $bgPhoto: string }>`
+  display: flex;
+  align-items: flex-end;
   font-size: 20px;
   background-image: url(${(props) => props.$bgPhoto});
   background-size: cover;
@@ -77,17 +80,15 @@ const Box = styled(motion.div)<{ $bgPhoto: string }>`
 `;
 
 const Info = styled(motion.div)`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
+  flex: 1 1 0;
+  padding: 8px;
+  color: white;
+  text-align: center;
+  background-color: black;
   opacity: 0;
-  h4 {
-    display: block;
-    padding: 10px;
-    background-color: black;
-    text-align: center;
-    font-size: 14px;
+  strong {
+    font-size: 10px;
+    ${makeLineClampStyle(1.3, 2)}
   }
 `;
 
@@ -109,7 +110,7 @@ const boxVariants = {
   },
   hover: {
     scale: 1.3,
-    y: -40,
+    y: -25,
     zIndex: 1,
     transition: {
       delay: 0.3,
@@ -123,8 +124,8 @@ const infoVariants = {
   hover: {
     opacity: 1,
     transition: {
-      delay: 0.3,
-      duration: 0.2,
+      delay: 0.4,
+      duration: 0.4,
       type: "tween",
     },
   },
@@ -133,6 +134,8 @@ const infoVariants = {
 const offset = 6;
 
 function Home() {
+  const navigate = useNavigate();
+
   const { data, isLoading } = useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getMovies);
 
   const [index, setIndex] = useState(0);
@@ -148,6 +151,10 @@ function Home() {
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
     }
+  };
+
+  const onBoxClicked = (movieId: number) => {
+    navigate(`/movies/${movieId}`);
   };
 
   return (
@@ -172,15 +179,17 @@ function Home() {
                     .slice(offset * index, offset * (index + 1))
                     .map((movie) => (
                       <Box
+                        key={movie.id}
+                        layoutId={`movieBox${movie.id}`}
                         variants={boxVariants}
                         whileHover="hover"
                         initial="normal"
                         transition={{ type: "tween" }}
-                        key={movie.id}
+                        onClick={() => onBoxClicked(movie.id)}
                         $bgPhoto={makeImagePath(movie.backdrop_path || movie.poster_path, "w500")}
                       >
                         <Info variants={infoVariants}>
-                          <h4>{movie.title}</h4>
+                          <strong>{movie.title}</strong>
                         </Info>
                       </Box>
                     ))}
@@ -188,6 +197,7 @@ function Home() {
               </AnimatePresence>
             </Slider>
           </div>
+          <Outlet />
         </>
       )}
     </Wrapper>

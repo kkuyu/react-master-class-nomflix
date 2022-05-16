@@ -65,10 +65,7 @@ const Search = styled.div`
   display: flex;
   align-items: center;
   button {
-    padding: 0;
     color: white;
-    border: none;
-    background: none;
   }
   svg {
     display: block;
