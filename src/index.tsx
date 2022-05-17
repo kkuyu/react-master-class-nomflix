@@ -77,6 +77,12 @@ button {
   background: none;
   cursor: pointer;
 }
+svg {
+  display: block;
+}
+img {
+  max-width: 100%;
+}
 `;
 
 const client = new QueryClient();

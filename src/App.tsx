@@ -5,7 +5,8 @@ import Search from "./Routes/Search";
 import Tv from "./Routes/Tv";
 
 import Header from "./component/Header";
-import Movies from "./component/Movies";
+import Footer from "./component/Footer";
+import PreviewLayer from "./component/PreviewLayer";
 
 function App() {
   return (
@@ -13,11 +14,14 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home />}>
-          <Route path="movies/:movieId" element={<Movies />}></Route>
+          <Route path="movies/:movieId" element={<PreviewLayer />}></Route>
         </Route>
-        <Route path="/tv" element={<Tv />}></Route>
+        <Route path="/tv" element={<Tv />}>
+          <Route path="tvs/:tvId" element={<PreviewLayer />}></Route>
+        </Route>
         <Route path="/search" element={<Search />}></Route>
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
